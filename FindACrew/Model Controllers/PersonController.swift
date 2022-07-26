@@ -26,8 +26,20 @@ class PersonController {
     private lazy var peopleURL = URL(string: "/api/people", relativeTo: baseURL)!
     
     
-    func fetchPeople(completion: @escaping (Result<[Person], NetworkError>) -> Void ) {
-        URLSession.shared.dataTask(with: peopleURL) { data, _, error in
+    func fetchPerson(withTerm searchTerm: String, completion: @escaping (Result<[Person], NetworkError>) -> Void ) {
+        var urlComponent = URLComponents(url: peopleURL, resolvingAgainstBaseURL: true)
+        let query = URLQueryItem(name: "search", value: searchTerm)
+        urlComponent?.queryItems = [query]
+        
+        guard let requestURL = urlComponent?.url else {
+            return
+        }
+        
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = HTTPMethod.get.rawValue
+        
+        
+        URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
                 print(error)
                 completion(.failure(.fetchDataFailed))
