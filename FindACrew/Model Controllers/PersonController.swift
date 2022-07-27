@@ -8,18 +8,18 @@
 
 import Foundation
 
+enum NetworkError: Error {
+case noData
+case fetchDataFailed
+case decodingError
+}
+
 class PersonController {
     enum HTTPMethod: String {
         case get = "GET"
         case put = "PUT"
         case post = "POST"
         case delete = "DELETE"
-    }
-    
-    enum NetworkError: Error {
-    case noData
-    case fetchDataFailed
-    case decodingError
     }
     
     private let baseURL = URL(string: "https://lambdaswapi.herokuapp.com")!

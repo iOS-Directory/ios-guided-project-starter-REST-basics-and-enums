@@ -10,9 +10,12 @@ import UIKit
 
 class PersonSearchTableViewController: UITableViewController {
     
+    //MARK: - Outlets
     @IBOutlet weak var searchBar: UISearchBar!
     
-    let leia = Person(name: "Leia Organa", birthYear: "19BBY", height: "150")
+    //MARK: - Properties
+    var personController = PersonController()
+    var people: [Person]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,16 +35,39 @@ class PersonSearchTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: PersonTableViewCell.reuseIdentifier, for: indexPath) as! PersonTableViewCell
 
-        // Configure the cell...
-        cell.nameLabel.text = leia.name
-        cell.heightLabel.text = "\(leia.height) cm"
-        cell.birthYearLabel.text = "Born \(leia.birthYear)"
+        if let people = self.people {
+            
+            let person = people[indexPath.row]
+            // Configure the cell...
+            cell.nameLabel.text = person.name
+            cell.heightLabel.text = "\(person.height) cm"
+            cell.birthYearLabel.text = "Born \(person.birthYear)"
+        }
+        
         return cell
     }
+
+//MARK: - Private Helper Methods
+    private func processData(result: Result<[Person], NetworkError>) {
+        switch result {
+        case .success(let people):
+            self.people = people
+        case .failure(let error):
+            print(error)
+        }
+    }
+    
 }
 
 extension PersonSearchTableViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
+        guard let searchTerm = searchBar.text else {
+            print("No search term found.")
+            return
+        }
+        personController.fetchPerson(withTerm: searchTerm) { result in
+            self.processData(result: result)
+        }
     }
 }
