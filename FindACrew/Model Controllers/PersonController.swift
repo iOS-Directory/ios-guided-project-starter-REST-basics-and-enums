@@ -52,8 +52,8 @@ class PersonController {
             }
             
             do{
-                let people = try JSONDecoder().decode([Person].self, from: data)
-                completion(.success(people))
+                let results = try JSONDecoder().decode(People.self, from: data)
+                completion(.success(results.results))
             }catch{
                 print("Error decoding data: \(error)")
                 completion(.failure(.decodingError))

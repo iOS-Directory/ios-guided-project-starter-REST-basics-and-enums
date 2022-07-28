@@ -29,16 +29,15 @@ class PersonSearchTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return people?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: PersonTableViewCell.reuseIdentifier, for: indexPath) as! PersonTableViewCell
 
-        if let people = self.people {
+        if let people = self.people, people.count >= 1 {
             
             let person = people[indexPath.row]
-            // Configure the cell...
             cell.nameLabel.text = person.name
             cell.heightLabel.text = "\(person.height) cm"
             cell.birthYearLabel.text = "Born \(person.birthYear)"
@@ -52,6 +51,10 @@ class PersonSearchTableViewController: UITableViewController {
         switch result {
         case .success(let people):
             self.people = people
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            
         case .failure(let error):
             print(error)
         }
